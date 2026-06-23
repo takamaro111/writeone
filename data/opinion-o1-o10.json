@@ -1,0 +1,104 @@
+{
+  "prints": [
+    {
+      "code": "O-1",
+      "topic_jp": "大学は卒業する必要があると思いますか？",
+      "topic_en": "Do you think it is necessary to graduate from university?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "In my opinion, ～.", "I believe that ～.", "Personally, I think ～."],
+        "理由を述べる表現": ["because ～", "since ～", "for the reason that ～", "one reason is that ～"],
+        "関連語句の例": ["education / 教育", "career / キャリア", "opportunity / 機会", "skills / スキル", "experience / 経験", "future / 将来"]
+      }
+    },
+    {
+      "code": "O-2",
+      "topic_jp": "学生は毎日英語を勉強するべきだと思いますか？",
+      "topic_en": "Do you think students should study English every day?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I agree that ～.", "In my opinion, ～.", "I do not think ～."],
+        "理由を述べる表現": ["because ～", "for example, ～", "This is because ～", "one reason is that ～"],
+        "関連語句の例": ["habit / 習慣", "practice / 練習", "improve / 上達する", "communication / 会話", "confidence / 自信", "useful / 役に立つ"]
+      }
+    },
+    {
+      "code": "O-3",
+      "topic_jp": "子どもはスマートフォンを持つべきだと思いますか？",
+      "topic_en": "Do you think children should have smartphones?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I believe that ～.", "In my view, ～.", "I disagree because ～."],
+        "理由を述べる表現": ["because ～", "for instance, ～", "another reason is ～", "This helps them ～"],
+        "関連語句の例": ["smartphone / スマートフォン", "safety / 安全", "parents / 親", "rules / ルール", "screen time / 使用時間", "communication / 連絡"]
+      }
+    },
+    {
+      "code": "O-4",
+      "topic_jp": "学校の宿題は多いほうがよいと思いますか？",
+      "topic_en": "Do you think students should have a lot of homework?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I do not agree that ～.", "In my opinion, ～.", "My answer is yes/no because ～."],
+        "理由を述べる表現": ["because ～", "one reason is that ～", "For example, ～", "This makes students ～"],
+        "関連語句の例": ["homework / 宿題", "review / 復習", "free time / 自由時間", "stress / ストレス", "learn / 学ぶ", "balance / バランス"]
+      }
+    },
+    {
+      "code": "O-5",
+      "topic_jp": "朝早く起きることは大切だと思いますか？",
+      "topic_en": "Do you think getting up early is important?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I believe ～.", "In my opinion, ～.", "Personally, I feel ～."],
+        "理由を述べる表現": ["because ～", "This is important because ～", "For example, ～", "one reason is that ～"],
+        "関連語句の例": ["morning / 朝", "health / 健康", "time / 時間", "routine / 習慣", "productive / 生産的な", "sleep / 睡眠"]
+      }
+    },
+    {
+      "code": "O-6",
+      "topic_jp": "学校で制服を着るべきだと思いますか？",
+      "topic_en": "Do you think students should wear school uniforms?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I agree with this idea.", "I disagree with this idea.", "In my opinion, ～."],
+        "理由を述べる表現": ["because ～", "for this reason, ～", "For example, ～", "This can help students ～"],
+        "関連語句の例": ["uniform / 制服", "school life / 学校生活", "equal / 平等な", "fashion / ファッション", "cost / 費用", "identity / 一体感"]
+      }
+    },
+    {
+      "code": "O-7",
+      "topic_jp": "本を読むことは映画を見ることよりよいと思いますか？",
+      "topic_en": "Do you think reading books is better than watching movies?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I prefer ～.", "In my opinion, ～.", "I believe that ～."],
+        "理由を述べる表現": ["because ～", "for example, ～", "one reason is that ～", "This gives us ～"],
+        "関連語句の例": ["reading / 読書", "movie / 映画", "imagination / 想像力", "knowledge / 知識", "fun / 楽しい", "story / 物語"]
+      }
+    },
+    {
+      "code": "O-8",
+      "topic_jp": "友だちは多いほうがよいと思いますか？",
+      "topic_en": "Do you think it is better to have many friends?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I do not think ～.", "In my opinion, ～.", "Personally, I believe ～."],
+        "理由を述べる表現": ["because ～", "For example, ～", "This is because ～", "one reason is that ～"],
+        "関連語句の例": ["friend / 友だち", "support / 支え", "trust / 信頼", "talk / 話す", "important / 大切な", "relationship / 関係"]
+      }
+    },
+    {
+      "code": "O-9",
+      "topic_jp": "旅行は良い学びになると思いますか？",
+      "topic_en": "Do you think traveling is a good way to learn?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I believe that ～.", "In my opinion, ～.", "My answer is yes because ～."],
+        "理由を述べる表現": ["because ～", "for example, ～", "one reason is that ～", "This experience can ～"],
+        "関連語句の例": ["travel / 旅行", "culture / 文化", "experience / 経験", "learn / 学ぶ", "people / 人々", "world / 世界"]
+      }
+    },
+    {
+      "code": "O-10",
+      "topic_jp": "将来、ロボットは私たちの生活をより良くすると思いますか？",
+      "topic_en": "Do you think robots will make our lives better in the future?",
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "I believe that ～.", "In the future, ～.", "In my opinion, ～."],
+        "理由を述べる表現": ["because ～", "for example, ～", "one reason is that ～", "This will help people ～"],
+        "関連語句の例": ["robot / ロボット", "future / 未来", "technology / 技術", "help / 助ける", "life / 生活", "convenient / 便利な"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "prints": [
+    {
+      "code": "O-1",
+      "stage": "Opinion",
+      "title": "意見文（50〜80語）",
+      "lead": "あなたの意見とその理由を英語で書きましょう。",
+      "topic_jp": "大学は卒業する必要があると思いますか？",
+      "topic_en": "Do you think it is necessary to graduate from university?",
+      "word_count": "50〜80語",
+      "structure": ["意見", "理由"],
+      "sidebar": [
+        "自分の意見を最初に書く",
+        "理由を1つ具体的に書く",
+        "簡単な単語でも自分の言葉で書く"
+      ],
+      "writing_lines": 10,
+      "memo_lines": 3,
+      "word_tips": [
+        ["50語未満", "もう少し具体的に書き足そう！"],
+        ["50〜80語", "ちょうど良いボリューム！"],
+        ["80語超え", "簡潔にまとめる練習も大切！"]
+      ],
+      "phrases": {
+        "意見を述べる表現": ["I think ～.", "In my opinion, ～.", "I believe that ～.", "Personally, I think ～."],
+        "理由を述べる表現": ["because ～", "since ～", "for the reason that ～", "one reason is that ～"],
+        "関連語句の例": ["education / 教育", "career / キャリア", "opportunity / 機会", "skills / スキル", "experience / 経験", "future / 将来"]
+      }
+    },
+    {
+      "code": "E-1",
+      "stage": "Essay",
+      "title": "短いエッセイ（150語程度）",
+      "lead": "与えられたテーマについて、構成に沿って英語で書きましょう。",
+      "topic_jp": "オンライン授業は対面授業より効果的だと思いますか？",
+      "topic_en": "Do you think online classes are more effective than face-to-face classes?",
+      "word_count": "130〜170語",
+      "structure": ["導入", "本論", "結論"],
+      "sidebar": [
+        "導入でテーマの背景を書く",
+        "本論で理由と具体例を書く",
+        "結論で自分の意見をまとめる"
+      ],
+      "writing_lines": 14,
+      "memo_lines": 4,
+      "word_tips": [
+        ["130語未満", "内容がやや不足しているかも"],
+        ["130〜170語", "ちょうど良いボリューム！"],
+        ["170語超え", "簡潔にまとめる練習も大切！"]
+      ],
+      "phrases": {
+        "導入の表現": ["In recent years, ～", "Nowadays, ～", "It is often debated whether ～", "This essay will discuss ～"],
+        "理由を述べる表現": ["One reason is that ～", "Another advantage is ～", "For example, ～", "This means that ～"],
+        "結論の表現": ["In conclusion, ～", "To sum up, ～", "Therefore, I believe that ～", "It is important to ～"],
+        "関連語彙の例": ["effective / 効果的な", "flexible / 柔軟性のある", "communication / コミュニケーション", "concentrate / 集中する", "learning outcomes / 学習成果", "accessible / アクセスしやすい"]
+      }
+    },
+    {
+      "code": "A-1",
+      "stage": "Advanced",
+      "title": "英検準1級レベルのエッセイ（180〜200語）",
+      "lead": "与えられたテーマについて、論理的に意見を述べ、理由を示し、結論を導きましょう。",
+      "topic_jp": "人工知能（AI）は人間の仕事を奪うよりも、新しい仕事を生み出すと思いますか？",
+      "topic_en": "Do you think artificial intelligence will create more jobs than it will eliminate?",
+      "word_count": "180〜200語",
+      "structure": ["意見", "理由①", "理由②", "結論"],
+      "sidebar": [
+        "意見を明確に述べる",
+        "理由を2つ挙げる",
+        "具体例や説明を加える",
+        "接続詞を使って論理的につなげる"
+      ],
+      "writing_lines": 16,
+      "memo_lines": 4,
+      "word_tips": [
+        ["140語未満", "内容が不足しているかも"],
+        ["180〜200語", "ちょうど良いボリューム！"],
+        ["200語超え", "簡潔にまとめる練習も大切！"]
+      ],
+      "phrases": {
+        "意見を述べる表現": ["I believe that ～", "In my opinion, ～", "I am convinced that ～", "From my perspective, ～"],
+        "理由を述べる表現": ["One reason is that ～", "Another reason is that ～", "A key factor is that ～", "This is because ～"],
+        "結論を述べる表現": ["In conclusion, ～", "To sum up, ～", "Therefore, I believe that ～", "Looking ahead, ～"],
+        "関連語句の例": ["artificial intelligence / 人工知能", "automation / 自動化", "productivity / 生産性", "employment / 雇用", "innovation / 革新", "reskilling / 再教育"]
+      }
+    },
+    {
+      "code": "M-1",
+      "stage": "Master",
+      "title": "英検1級レベルのエッセイ（250語程度）",
+      "lead": "与えられたテーマについて、深く掘り下げ、論理的に展開し、説得力のある英語でエッセイを書きましょう。",
+      "topic_jp": "経済成長よりも環境保護を優先すべきだ。",
+      "topic_en": "Environmental protection should be given priority over economic growth.",
+      "word_count": "240〜260語",
+      "structure": ["導入", "本論①", "本論②", "反対意見", "結論"],
+      "sidebar": [
+        "立場を明確にする",
+        "具体例や根拠を使う",
+        "反対意見にも触れる",
+        "再反論を入れる",
+        "結論で主張を強める"
+      ],
+      "writing_lines": 18,
+      "memo_lines": 5,
+      "word_tips": [
+        ["240語未満", "内容が不足しているかも"],
+        ["240〜260語", "ちょうど良いボリューム！"],
+        ["260語超え", "簡潔にまとめる練習も大切！"]
+      ],
+      "phrases": {
+        "導入の表現": ["In recent years, ～", "It is widely argued that ～", "The issue of ～ has become increasingly important.", "There is no doubt that ～"],
+        "理由を述べる表現": ["One compelling reason is that ～", "A key factor is that ～", "This is evidenced by the fact that ～", "For instance, ～"],
+        "反対意見への対応": ["Some people argue that ～", "However, this view overlooks ～", "While it is true that ～, it is also important to consider ～", "Nevertheless, ～"],
+        "関連語彙の例": ["sustainable / 持続可能な", "renewable energy / 再生可能エネルギー", "ecosystem / 生態系", "global warming / 地球温暖化", "economic development / 経済発展", "intergenerational equity / 世代間の公平"]
+      }
+    }
+  ],
+  "common": {
+    "heading": "英作文 毎日プリント",
+    "subheading": "AI添削で、英語が「書ける」力に変わる。",
+    "checklist": [
+      "意見を明確に書いた",
+      "理由を具体的に書いた",
+      "構成に沿って書いた",
+      "語数の範囲に収まっている",
+      "文法・スペルに注意した"
+    ],
+    "feedback": [
+      "文法の正確さ",
+      "語彙の自然さ",
+      "論理展開",
+      "構成の明確さ",
+      "改善案"
+    ],
+    "footer": "書き終えたら、アプリで提出してAI添削を受けましょう。"
+  }
+}
