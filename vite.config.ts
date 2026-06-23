@@ -25,7 +25,8 @@ export default defineConfig({
         ]
       },
       workbox: {
-        navigateFallback: "/offline.html",
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/pdf\//],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"]
       }
     })

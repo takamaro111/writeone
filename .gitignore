@@ -34,3 +34,4 @@ Thumbs.db
 
 # Supabase local state
 .supabase/
+supabase/.temp/

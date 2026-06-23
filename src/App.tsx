@@ -287,7 +287,7 @@ function Home({
           <Metric label="累計学習" value={`${totalStudyDays(submissions)}日`} />
           <Metric label="平均点" value={`${averageScore(submissions)}点`} />
         </div>
-        <button className="primary-button mt-5 w-full" onClick={() => onOpen(today, "answer")}>始める</button>
+        <button className="primary-button mt-5 w-full" onClick={() => onOpen(today)}>始める</button>
       </section>
 
       <section className="card p-5">
