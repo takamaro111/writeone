@@ -151,7 +151,7 @@ function fileToImageDataUrl(file: File): Promise<string> {
   });
 }
 
-function Login({ onLogin }: { onLogin: (profile: UserProfile) => void }) {
+function Login({ onLogin, onBackToLanding }: { onLogin: (profile: UserProfile) => void; onBackToLanding?: () => void }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -199,6 +199,18 @@ function Login({ onLogin }: { onLogin: (profile: UserProfile) => void }) {
 
   return (
     <main className="min-h-screen bg-mist px-5 py-8">
+      {onBackToLanding && (
+        <div className="mx-auto mb-4 max-w-md">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-navy shadow-soft"
+            onClick={onBackToLanding}
+          >
+            <span aria-hidden="true">←</span>
+            <span>LPに戻る</span>
+          </button>
+        </div>
+      )}
       <section className="mx-auto max-w-md overflow-hidden rounded-[28px] bg-white shadow-soft">
         <div className="top-gradient px-6 py-9">
           <div className="rounded-[24px] bg-white p-4 shadow-soft">
@@ -826,9 +838,190 @@ function Admin({ stats }: { stats: AdminStats | null }) {
   );
 }
 
+function LandingPage({ onStart }: { onStart: () => void }) {
+  const features = [
+    {
+      title: "400枚のPDFプリント",
+      text: "Opinion / Essay / Advanced / Master の4レベルに対応。各100枚、合計400枚のA4プリントを収録しています。"
+    },
+    {
+      title: "写真で提出",
+      text: "印刷したプリントに手書きした英文を、スマホで撮影してそのまま提出できます。"
+    },
+    {
+      title: "AI添削スコア",
+      text: "文法・語彙・論理・構成・一貫性を100点満点で評価し、改善ポイントまで確認できます。"
+    },
+    {
+      title: "PC・スマホ同期",
+      text: "Supabase Authでログインすれば、学習履歴や添削結果を端末間で同期できます。"
+    }
+  ];
+
+  const flow = [
+    "今日のプリントを選ぶ",
+    "PDFを開く、または印刷する",
+    "アプリに入力、または手書きプリントを撮影",
+    "AI添削を依頼する",
+    "スコアと改善点を確認する",
+    "履歴から復習する"
+  ];
+
+  const feedbackItems = ["総合スコア", "文法スコア", "語彙スコア", "論理スコア", "構成スコア", "一貫性スコア", "良かった点", "改善ポイント", "文ごとの修正", "修正版英文", "次回アドバイス"];
+  const plans = [
+    {
+      name: "Free",
+      price: "¥0",
+      caption: "まずは試したい方向け",
+      limit: "月3回までAI添削",
+      lead: "基本機能で、英作文プリント学習を始められます。",
+      features: ["400枚のPDFプリント閲覧", "学習履歴の保存", "PC・スマホ同期", "AI添削 月3回"]
+    },
+    {
+      name: "Premium",
+      price: "¥2,980",
+      caption: "おすすめプラン",
+      limit: "月100回までAI添削",
+      lead: "毎日しっかり書き、AI添削で改善を積み重ねたい方向けです。",
+      recommended: true,
+      features: ["Freeの全機能", "AI添削 月100回", "文ごとの修正表示", "修正版英文サンプル", "復習用の学習履歴"]
+    },
+    {
+      name: "Pro",
+      price: "¥4,980",
+      caption: "集中学習・共同利用向け",
+      limit: "月300回までAI添削",
+      lead: "高頻度の添削や教室利用、共同開発・運用テストにも使いやすい上位プランです。",
+      features: ["Premiumの全機能", "AI添削 月300回", "高度な学習分析", "管理者画面", "チーム利用を想定"]
+    }
+  ];
+
+  return (
+    <main className="landing-page">
+      <section className="landing-hero">
+        <div className="landing-hero-bg" aria-hidden="true" />
+        <header className="landing-header">
+          <img src="/brand/writeone-logo-transparent.png" alt="WriteOne" className="landing-logo" />
+          <nav className="landing-nav" aria-label="Landing navigation">
+            <a href="#features">機能</a>
+            <a href="#flow">学習フロー</a>
+            <a href="#plans">料金</a>
+            <button type="button" onClick={onStart}>ログイン</button>
+          </nav>
+        </header>
+        <div className="landing-hero-content">
+          <p className="landing-kicker">英作文学習アプリ / PWA対応</p>
+          <h1>毎日1枚で、<br />英作文力を伸ばす。</h1>
+          <p>
+            WriteOneは、英作文プリントを毎日1枚ずつ解き、AI添削で書く力を伸ばす学習アプリです。
+            紙のプリント学習とAI添削をひとつにし、スマホでもPCでも続けられます。
+          </p>
+          <div className="landing-actions">
+            <button type="button" onClick={onStart}>無料で始める</button>
+            <a href="#flow">学習の流れを見る</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="landing-section">
+        <div className="landing-section-head">
+          <p>主な機能</p>
+          <h2>書いて、撮って、AI添削。</h2>
+          <span>英検準1級〜1級レベルまで、紙とアプリの両方で学習できます。</span>
+        </div>
+        <div className="landing-feature-grid">
+          {features.map((feature, index) => (
+            <article key={feature.title} className="landing-feature-card">
+              <span>{index + 1}</span>
+              <h3>{feature.title}</h3>
+              <p>{feature.text}</p>
+            </article>
+          ))}
+        </div>
+        <img src="/landing/writeone-hero.png" alt="WriteOneのプリント、スマホ提出、AI添削、PC同期の画面" className="landing-wide-image" />
+      </section>
+
+      <section id="flow" className="landing-section landing-flow-section">
+        <div className="landing-section-head">
+          <p>学習フロー</p>
+          <h2>毎日1枚、提出から復習まで。</h2>
+          <span>プリントを選び、書いて、AI添削を受け、履歴から復習します。</span>
+        </div>
+        <div className="landing-flow-layout">
+          <ol className="landing-flow-list">
+            {flow.map((item, index) => (
+              <li key={item}>
+                <span>{index + 1}</span>
+                <strong>{item}</strong>
+              </li>
+            ))}
+          </ol>
+          <img src="/landing/writeone-flow.png" alt="WriteOneの学習フロー" />
+        </div>
+      </section>
+
+      <section className="landing-section landing-two-column">
+        <div>
+          <p className="landing-eyebrow">PDFプリント</p>
+          <h2>教材販売に使える、整ったA4プリント。</h2>
+          <p>
+            白背景とネイビー基調のA4縦1ページ設計。回答欄、構成メモ、チェックリスト、語数目安つきで、
+            スマホ・PCから閲覧し、PWA内の印刷ボタンから印刷できます。
+          </p>
+        </div>
+        <div>
+          <p className="landing-eyebrow">AI添削内容</p>
+          <h2>文法だけでなく、<br />論理・構成まで<br />見える化。</h2>
+          <div className="landing-tag-grid">
+            {feedbackItems.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </div>
+      </section>
+
+      <section id="plans" className="landing-section">
+        <div className="landing-section-head">
+          <p>プラン</p>
+          <h2>Free・Premium・Pro<br />に対応。</h2>
+          <span>月間AI添削回数をプランごとに管理できます。</span>
+        </div>
+        <div className="landing-plan-grid">
+          {plans.map((plan) => (
+            <article key={plan.name} className={`landing-plan-card ${plan.recommended ? "landing-plan-card-recommended" : ""}`}>
+              {plan.recommended && <div className="landing-plan-ribbon">おすすめ</div>}
+              <p className="landing-plan-caption">{plan.caption}</p>
+              <h3>{plan.name}</h3>
+              <div className="landing-plan-price">
+                <strong>{plan.price}</strong>
+                <span>/ 月</span>
+              </div>
+              <p className="landing-plan-limit">{plan.limit}</p>
+              <p>{plan.lead}</p>
+              <ul>
+                {plan.features.map((feature) => <li key={feature}>{feature}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-cta">
+        <h2>400枚の英作文プリントで、書く習慣をつくる。</h2>
+        <p>手書きプリントも写真でそのまま添削。スマホでもPCでも、学習履歴を自動同期します。</p>
+        <button type="button" className="landing-cta-button" onClick={onStart}>
+          <span className="landing-cta-button-note">登録は1分で完了</span>
+          <strong>無料会員登録はこちら</strong>
+          <span className="landing-cta-arrow" aria-hidden="true">→</span>
+        </button>
+        <small>クレジットカード不要。Freeプランからすぐに始められます。</small>
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
   const storedProfile = canUseSupabaseAuth() ? null : getProfile();
   const [profile, setProfile] = useState<UserProfile | null>(() => storedProfile);
+  const [showLogin, setShowLogin] = useState(() => window.location.hash === "#login" || window.location.search.includes("app=1"));
   const [authLoading, setAuthLoading] = useState(() => canUseSupabaseAuth());
   const [view, setView] = useState<View>("home");
   const [viewHistory, setViewHistory] = useState<View[]>([]);
@@ -911,8 +1104,12 @@ export default function App() {
     );
   }
 
+  if (!profile && !showLogin) {
+    return <LandingPage onStart={() => { window.location.hash = "login"; setShowLogin(true); }} />;
+  }
+
   if (!profile) {
-    return <Login onLogin={setProfile} />;
+    return <Login onLogin={setProfile} onBackToLanding={() => { window.location.hash = ""; setShowLogin(false); }} />;
   }
 
   function navigate(target: View) {
