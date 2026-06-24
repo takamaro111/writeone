@@ -64,16 +64,4 @@
     @apply text-navy;
   }
 
-  .pdf-frame {
-    @apply block w-full border-0 bg-slate-100;
-    height: calc(100dvh - 190px);
-    min-height: 560px;
-  }
-
-  @media (max-width: 640px) {
-    .pdf-frame {
-      height: calc(100dvh - 180px);
-      min-height: 620px;
-    }
-  }
 }

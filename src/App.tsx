@@ -19,7 +19,7 @@ import { FeedbackResult } from "./pages/FeedbackResult";
 import type { Feedback, Level, PrintItem, PrintProgress, Submission, UserProfile } from "./types";
 import writeOneLogo from "./assets/writeone-logo.png";
 
-type View = "home" | "prints" | "detail" | "pdf" | "answer" | "confirm" | "feedback" | "history" | "progress" | "profile" | "admin";
+type View = "home" | "prints" | "detail" | "answer" | "confirm" | "feedback" | "history" | "progress" | "profile" | "admin";
 
 const levelNames: Record<Level, string> = {
   Opinion: "Opinion",
@@ -239,7 +239,7 @@ function Header({ profile }: { profile: UserProfile }) {
 }
 
 function BackButton({ view, onBack }: { view: View; onBack: () => void }) {
-  const show = ["detail", "pdf", "answer", "confirm", "feedback", "admin"].includes(view);
+  const show = ["detail", "answer", "confirm", "feedback", "admin"].includes(view);
   if (!show) return null;
 
   return (
@@ -385,7 +385,9 @@ function PrintList({
   );
 }
 
-function PrintDetail({ print, onAnswer, onPdf }: { print: PrintItem; onAnswer: () => void; onPdf: () => void }) {
+function PrintDetail({ print, onAnswer }: { print: PrintItem; onAnswer: () => void }) {
+  const pdfHref = new URL(print.pdfUrl, window.location.origin).toString();
+
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
@@ -410,28 +412,12 @@ function PrintDetail({ print, onAnswer, onPdf }: { print: PrintItem; onAnswer: (
       </section>
       <div className="grid grid-cols-2 gap-3">
         <button className="primary-button" onClick={onAnswer}>回答する</button>
-        <button className="secondary-button text-center" onClick={onPdf}>PDFを開く</button>
+        <a className="secondary-button text-center" href={pdfHref} target="_blank" rel="noopener noreferrer external">PDFを開く</a>
       </div>
     </div>
   );
 }
 
-function PdfViewer({ print }: { print: PrintItem }) {
-  return (
-    <div className="space-y-3 px-3 py-4 sm:px-5">
-      <section className="card overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
-          <div>
-            <p className="text-lg font-black text-navy">{print.code}</p>
-            <p className="text-xs font-bold text-slate-500">{print.title}</p>
-          </div>
-          <a className="secondary-button !px-3 !py-2" href={print.pdfUrl} target="_blank" rel="noreferrer">別で開く</a>
-        </div>
-        <iframe className="pdf-frame" src={`${print.pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&zoom=page-fit`} title={`${print.code} PDF`} />
-      </section>
-    </div>
-  );
-}
 function AnswerInput({
   print,
   initial,
@@ -884,7 +870,6 @@ export default function App() {
   function goBack() {
     const fallback: Partial<Record<View, View>> = {
       detail: "prints",
-      pdf: "detail",
       answer: "detail",
       confirm: "answer",
       feedback: "detail",
@@ -902,8 +887,7 @@ export default function App() {
       <main className="mx-auto max-w-5xl">
         {view === "home" && <Home progress={progress} submissions={submissions} onOpen={openPrint} onOpenFeedback={openSubmissionFeedback} />}
         {view === "prints" && <PrintList progress={progress} favorites={favorites} onOpen={openPrint} onToggleFavorite={toggleFavorite} />}
-        {view === "detail" && <PrintDetail print={selected} onAnswer={() => openPrint(selected, "answer")} onPdf={() => navigate("pdf")} />}
-        {view === "pdf" && <PdfViewer print={selected} />}
+        {view === "detail" && <PrintDetail print={selected} onAnswer={() => openPrint(selected, "answer")} />}
         {view === "answer" && <AnswerInput print={selected} initial={answer} ownerId={profile?.id} initialImageDataUrl={answerImageDataUrl} onImageChange={setAnswerImageDataUrl} onConfirm={(value) => { setAnswer(value); navigate("confirm"); }} />}
         {view === "confirm" && <ConfirmSubmit print={selected} answer={answer} imageDataUrl={answerImageDataUrl} loading={loading} error={submitError} onBack={() => navigate("answer")} onSubmit={submitForFeedback} />}
         {view === "feedback" && selectedFeedback && <FeedbackResult feedback={selectedFeedback} submission={selectedSubmission} onResubmit={() => navigate("answer")} />}
