@@ -388,6 +388,28 @@ function PrintList({
 function PrintDetail({ print, onAnswer }: { print: PrintItem; onAnswer: () => void }) {
   const pdfHref = new URL(print.pdfUrl, window.location.origin).toString();
 
+  function printPdf() {
+    const frame = document.createElement("iframe");
+    frame.style.position = "fixed";
+    frame.style.right = "0";
+    frame.style.bottom = "0";
+    frame.style.width = "1px";
+    frame.style.height = "1px";
+    frame.style.border = "0";
+    frame.style.opacity = "0";
+    frame.src = pdfHref;
+    frame.onload = () => {
+      try {
+        frame.contentWindow?.focus();
+        frame.contentWindow?.print();
+      } catch {
+        window.print();
+      }
+      window.setTimeout(() => frame.remove(), 3000);
+    };
+    document.body.appendChild(frame);
+  }
+
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
@@ -410,9 +432,10 @@ function PrintDetail({ print, onAnswer }: { print: PrintItem; onAnswer: () => vo
           {print.tips.map((tip) => <li key={tip}>・ {tip}</li>)}
         </ul>
       </section>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         <button className="primary-button" onClick={onAnswer}>回答する</button>
         <a className="secondary-button text-center" href={pdfHref} target="_blank" rel="noopener noreferrer external">PDFを開く</a>
+        <button className="secondary-button text-center" onClick={printPdf}>印刷する</button>
       </div>
     </div>
   );
@@ -439,6 +462,18 @@ function AnswerInput({
   const words = countWords(answer);
   const inRange = words >= print.wordCountMin && words <= print.wordCountMax;
 
+  async function handleImageFile(file?: File | null) {
+    if (!file) return;
+    setImageError("");
+    try {
+      const dataUrl = await fileToImageDataUrl(file);
+      setImageDataUrl(dataUrl);
+      onImageChange(dataUrl);
+    } catch (caught) {
+      setImageError(caught instanceof Error ? caught.message : "画像を読み込めませんでした。");
+    }
+  }
+
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
@@ -458,27 +493,33 @@ function AnswerInput({
       <section className="card p-5">
         <p className="section-title">プリントを撮影して提出</p>
         <p className="mt-2 text-sm font-bold leading-6 text-slate-600">印刷したプリントに手書きした場合は、回答欄が大きく写るように撮影してください。AIが英文を読み取って添削します。</p>
-        <label className="secondary-button mt-4 block cursor-pointer text-center">
-          写真を撮る / 画像を選ぶ
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <label className="secondary-button block cursor-pointer text-center">
+          写真を撮る
           <input
             className="hidden"
             type="file"
             accept="image/*"
             capture="environment"
             onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              setImageError("");
-              try {
-                const dataUrl = await fileToImageDataUrl(file);
-                setImageDataUrl(dataUrl);
-                onImageChange(dataUrl);
-              } catch (caught) {
-                setImageError(caught instanceof Error ? caught.message : "画像を読み込めませんでした。");
-              }
+              await handleImageFile(event.target.files?.[0]);
+              event.currentTarget.value = "";
             }}
           />
         </label>
+        <label className="secondary-button block cursor-pointer text-center">
+          画像を選ぶ
+          <input
+            className="hidden"
+            type="file"
+            accept="image/*"
+            onChange={async (event) => {
+              await handleImageFile(event.target.files?.[0]);
+              event.currentTarget.value = "";
+            }}
+          />
+        </label>
+        </div>
         {imageDataUrl && (
           <div className="mt-4">
             <img src={imageDataUrl} alt="提出するプリント写真" className="max-h-72 w-full rounded-2xl bg-mist object-contain" />

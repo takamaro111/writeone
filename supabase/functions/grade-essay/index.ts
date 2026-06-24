@@ -240,7 +240,7 @@ async function gradeFromImage({
     return json({ error: "answer is empty" }, 400);
   }
   const wordCount = countWords(answerText);
-  if (wordCount < 5) {
+  if (wordCount < 2) {
     return json({ error: "answer is too short" }, 400);
   }
 
@@ -436,18 +436,19 @@ async function extractAnswerFromImage(apiKey: string, imageDataUrl: string) {
       input: [
         {
           role: "system",
-          content: "You extract handwritten or printed English essay answers from worksheet photos. Return only the answer text, not the topic, labels, headers, scores, or Japanese instructions."
+          content: "You extract handwritten or printed English essay answers from worksheet photos. Focus on the YOUR ESSAY answer area and handwritten English below it. Return only the answer text, not the topic, labels, headers, scores, checklist, sidebars, or Japanese instructions. If the handwriting is partly unclear, return your best readable reconstruction without adding new ideas."
         },
         {
           role: "user",
           content: [
             {
               type: "input_text",
-              text: "この画像の回答欄に書かれている英作文だけを読み取ってください。問題文、見出し、罫線、チェックリスト、日本語の説明は含めないでください。読み取れない単語は推測しすぎず、自然な英文として復元してください。"
+              text: "この画像の YOUR ESSAY / 回答欄に手書きされている英作文だけを読み取ってください。問題文、TOPIC、書く内容、見出し、罫線、チェックリスト、日本語の説明、右サイドバーは含めないでください。読み取れる英文が短くても、見えている英文をそのまま返してください。"
             },
             {
               type: "input_image",
-              image_url: imageDataUrl
+              image_url: imageDataUrl,
+              detail: "high"
             }
           ]
         }

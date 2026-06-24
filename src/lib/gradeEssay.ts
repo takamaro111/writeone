@@ -98,6 +98,9 @@ export async function gradeEssay(print: PrintItem, answer: string, options: Grad
       if (details?.error === "answer is empty") {
         throw new Error("写真から英文を読み取れませんでした。明るい場所で、回答欄が大きく写るように撮影してください。");
       }
+      if (details?.error === "answer is too short") {
+        throw new Error("写真から読み取れた英文が短すぎました。回答欄全体が大きく写るように撮り直してください。");
+      }
       throw new Error("画像からのAI添削に失敗しました。写真を撮り直してもう一度お試しください。");
     }
 
