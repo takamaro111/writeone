@@ -854,7 +854,7 @@ function LandingPage({ onStart }: { onStart: () => void }) {
     },
     {
       title: "PC・スマホ同期",
-      text: "Supabase Authでログインすれば、学習履歴や添削結果を端末間で同期できます。"
+      text: "ログインすれば、学習履歴や添削結果を端末間で同期できます。"
     }
   ];
 
@@ -1005,7 +1005,7 @@ function LandingPage({ onStart }: { onStart: () => void }) {
       </section>
 
       <section className="landing-cta">
-        <h2>400枚の英作文プリントで、書く習慣をつくる。</h2>
+        <h2>400枚の英作文プリントで、<br />書く習慣をつくる。</h2>
         <p>手書きプリントも写真でそのまま添削。スマホでもPCでも、学習履歴を自動同期します。</p>
         <button type="button" className="landing-cta-button" onClick={onStart}>
           <span className="landing-cta-button-note">登録は1分で完了</span>
