@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { prints, levels, getPrintByCode } from "./data/prints";
+import { loadAdminStats, type AdminStats } from "./lib/adminData";
 import { canUseSupabaseAuth, getCurrentProfile, signInWithEmail, signInWithProvider, signOut, signUpWithEmail } from "./lib/auth";
 import { loadCloudLearningState, setCloudFavorite, upsertCloudProgress } from "./lib/cloudData";
 import { gradeEssay } from "./lib/gradeEssay";
@@ -779,11 +780,11 @@ function Profile({ profile, favorites, onLogout, onAdmin }: { profile: UserProfi
       </section>
       <section className="card p-5">
         <p className="section-title">通知設定</p>
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <span className="text-sm font-black">Push通知</span>
           <button className="secondary-button !py-2">ON / OFF</button>
         </div>
-        <input className="input mt-3" type="time" defaultValue="20:00" />
+        <input className="input mt-3 max-w-[180px]" type="time" defaultValue="20:00" />
       </section>
       <section className="card p-5">
         <p className="section-title">サブスクリプション</p>
@@ -791,24 +792,24 @@ function Profile({ profile, favorites, onLogout, onAdmin }: { profile: UserProfi
           {["Free: 月3回までAI添削", "Premium: 月100回・全プリント", "Pro: 月300回・高度な分析"].map((plan) => <div key={plan} className="rounded-2xl bg-mist p-3 text-sm font-black">{plan}</div>)}
         </div>
       </section>
-      <div className="grid grid-cols-2 gap-3">
-        <button className="secondary-button" onClick={onAdmin}>管理画面</button>
+      <div className={`grid gap-3 ${profile.isAdmin ? "grid-cols-2" : "grid-cols-1"}`}>
+        {profile.isAdmin && <button className="secondary-button" onClick={onAdmin}>管理画面</button>}
         <button className="primary-button" onClick={onLogout}>ログアウト</button>
       </div>
     </div>
   );
 }
 
-function Admin({ submissions }: { submissions: Submission[] }) {
+function Admin({ stats }: { stats: AdminStats | null }) {
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
         <p className="section-title">簡易管理画面</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Metric label="ユーザー" value="1" />
+          <Metric label="ユーザー" value={`${stats?.users ?? "-"}`} />
           <Metric label="プリント" value="400" />
-          <Metric label="提出" value={`${submissions.length}`} />
-          <Metric label="AI使用" value={`${submissions.length}`} />
+          <Metric label="提出" value={`${stats?.submissions ?? "-"}`} />
+          <Metric label="AI使用" value={`${stats?.aiUsage ?? "-"}`} />
         </div>
       </section>
       <section className="card p-5">
@@ -836,6 +837,7 @@ export default function App() {
   const [answerImageDataUrl, setAnswerImageDataUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>(() => getSubmissions(storedProfile?.id));
   const [progress, setProgress] = useState<Record<string, PrintProgress>>(() => initialProgress(storedProfile?.id));
@@ -914,8 +916,19 @@ export default function App() {
   }
 
   function navigate(target: View) {
+    if (target === "admin" && !profile?.isAdmin) return;
     setViewHistory((history) => [...history, view]);
     setView(target);
+  }
+
+  function openAdmin() {
+    if (!profile?.isAdmin) return;
+    navigate("admin");
+    loadAdminStats()
+      .then(setAdminStats)
+      .catch((error) => {
+        console.error("failed to load admin stats", error);
+      });
   }
 
   function openPrint(print: PrintItem, target: View = "detail") {
@@ -1028,8 +1041,8 @@ export default function App() {
         {view === "feedback" && selectedFeedback && <FeedbackResult feedback={selectedFeedback} submission={selectedSubmission} onResubmit={() => navigate("answer")} />}
         {view === "history" && <History submissions={submissions} onOpenFeedback={openSubmissionFeedback} />}
         {view === "progress" && <Analytics submissions={submissions} progress={progress} />}
-        {view === "profile" && <Profile profile={profile} favorites={favorites} onLogout={logout} onAdmin={() => navigate("admin")} />}
-        {view === "admin" && <Admin submissions={submissions} />}
+        {view === "profile" && <Profile profile={profile} favorites={favorites} onLogout={logout} onAdmin={openAdmin} />}
+        {view === "admin" && profile.isAdmin && <Admin stats={adminStats} />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
         <div className="mx-auto grid max-w-md grid-cols-5">

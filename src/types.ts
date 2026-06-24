@@ -63,6 +63,7 @@ export interface UserProfile {
   createdAt: string;
   subscriptionPlan: Plan;
   subscriptionStatus: "active" | "trialing" | "inactive" | "canceled";
+  isAdmin?: boolean;
 }
 
 export interface PrintProgress {

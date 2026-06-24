@@ -16,7 +16,8 @@ function toProfile(row: any, fallbackEmail = ""): UserProfile {
     displayName: row.display_name ?? DEFAULT_DISPLAY_NAME,
     createdAt: row.created_at ?? new Date().toISOString(),
     subscriptionPlan: row.subscription_plan ?? "Free",
-    subscriptionStatus: row.subscription_status ?? "active"
+    subscriptionStatus: row.subscription_status ?? "active",
+    isAdmin: Boolean(row.is_admin)
   };
 }
 
@@ -77,7 +78,7 @@ async function ensureProfile(id: string, email: string, displayName: string): Pr
   if (!supabase) throw new Error("Supabaseが設定されていません。");
   const { data } = await supabase
     .from("profiles")
-    .select("id, email, display_name, created_at, subscription_plan, subscription_status")
+    .select("id, email, display_name, created_at, subscription_plan, subscription_status, is_admin")
     .eq("id", id)
     .maybeSingle();
   if (data) return toProfile(data, email);
@@ -91,7 +92,7 @@ async function ensureProfile(id: string, email: string, displayName: string): Pr
       subscription_plan: "Free",
       subscription_status: "active"
     })
-    .select("id, email, display_name, created_at, subscription_plan, subscription_status")
+    .select("id, email, display_name, created_at, subscription_plan, subscription_status, is_admin")
     .single();
 
   if (error) throw new Error(error.message);
