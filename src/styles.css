@@ -63,4 +63,10 @@
   .tab-button-active {
     @apply text-navy;
   }
+
+  .pdf-frame {
+    @apply block w-full border-0 bg-white;
+    height: calc(100dvh - 220px);
+    min-height: 520px;
+  }
 }

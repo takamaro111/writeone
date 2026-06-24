@@ -19,7 +19,7 @@ import { FeedbackResult } from "./pages/FeedbackResult";
 import type { Feedback, Level, PrintItem, PrintProgress, Submission, UserProfile } from "./types";
 import writeOneLogo from "./assets/writeone-logo.png";
 
-type View = "home" | "prints" | "detail" | "answer" | "confirm" | "feedback" | "history" | "progress" | "profile" | "admin";
+type View = "home" | "prints" | "detail" | "pdf" | "answer" | "confirm" | "feedback" | "history" | "progress" | "profile" | "admin";
 
 const levelNames: Record<Level, string> = {
   Opinion: "Opinion",
@@ -385,7 +385,7 @@ function PrintList({
   );
 }
 
-function PrintDetail({ print, onAnswer }: { print: PrintItem; onAnswer: () => void }) {
+function PrintDetail({ print, onAnswer, onPdf }: { print: PrintItem; onAnswer: () => void; onPdf: () => void }) {
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
@@ -394,28 +394,44 @@ function PrintDetail({ print, onAnswer }: { print: PrintItem; onAnswer: () => vo
             <p className="text-3xl font-black text-navy">{print.code}</p>
             <p className="text-sm font-black text-slate-500">{print.level}</p>
           </div>
-          <span className="pill">{print.wordCountMin}〜{print.wordCountMax}語</span>
+          <span className="pill">{print.wordCountMin}?{print.wordCountMax}?</span>
         </div>
         <h2 className="mt-5 text-xl font-black">{print.title}</h2>
         <p className="mt-4 text-lg font-black leading-8">{print.topicJp}</p>
         <p className="mt-2 text-sm font-bold leading-6 text-slate-600">{print.topicEn}</p>
       </section>
       <section className="card p-5">
-        <p className="section-title">構成</p>
+        <p className="section-title">??</p>
         <div className="mt-3 flex flex-wrap gap-2">{print.structure.map((item) => <span key={item} className="pill">{item}</span>)}</div>
-        <p className="section-title mt-5">書く内容のポイント</p>
+        <p className="section-title mt-5">?????????</p>
         <ul className="mt-3 space-y-2 text-sm font-bold text-slate-700">
-          {print.tips.map((tip) => <li key={tip}>□ {tip}</li>)}
+          {print.tips.map((tip) => <li key={tip}>? {tip}</li>)}
         </ul>
       </section>
       <div className="grid grid-cols-2 gap-3">
-        <button className="primary-button" onClick={onAnswer}>回答する</button>
-        <a className="secondary-button text-center" href={print.pdfUrl} target="_blank" rel="noreferrer">PDFを開く</a>
+        <button className="primary-button" onClick={onAnswer}>????</button>
+        <button className="secondary-button text-center" onClick={onPdf}>PDF???</button>
       </div>
     </div>
   );
 }
 
+function PdfViewer({ print }: { print: PrintItem }) {
+  return (
+    <div className="space-y-3 px-3 py-4 sm:px-5">
+      <section className="card overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+          <div>
+            <p className="text-lg font-black text-navy">{print.code}</p>
+            <p className="text-xs font-bold text-slate-500">{print.title}</p>
+          </div>
+          <a className="secondary-button !px-3 !py-2" href={print.pdfUrl} target="_blank" rel="noreferrer">????</a>
+        </div>
+        <iframe className="pdf-frame" src={`${print.pdfUrl}#toolbar=1&navpanes=0&view=FitH`} title={`${print.code} PDF`} />
+      </section>
+    </div>
+  );
+}
 function AnswerInput({
   print,
   initial,
@@ -868,6 +884,7 @@ export default function App() {
   function goBack() {
     const fallback: Partial<Record<View, View>> = {
       detail: "prints",
+      pdf: "detail",
       answer: "detail",
       confirm: "answer",
       feedback: "detail",
@@ -885,7 +902,8 @@ export default function App() {
       <main className="mx-auto max-w-5xl">
         {view === "home" && <Home progress={progress} submissions={submissions} onOpen={openPrint} onOpenFeedback={openSubmissionFeedback} />}
         {view === "prints" && <PrintList progress={progress} favorites={favorites} onOpen={openPrint} onToggleFavorite={toggleFavorite} />}
-        {view === "detail" && <PrintDetail print={selected} onAnswer={() => openPrint(selected, "answer")} />}
+        {view === "detail" && <PrintDetail print={selected} onAnswer={() => openPrint(selected, "answer")} onPdf={() => navigate("pdf")} />}
+        {view === "pdf" && <PdfViewer print={selected} />}
         {view === "answer" && <AnswerInput print={selected} initial={answer} ownerId={profile?.id} initialImageDataUrl={answerImageDataUrl} onImageChange={setAnswerImageDataUrl} onConfirm={(value) => { setAnswer(value); navigate("confirm"); }} />}
         {view === "confirm" && <ConfirmSubmit print={selected} answer={answer} imageDataUrl={answerImageDataUrl} loading={loading} error={submitError} onBack={() => navigate("answer")} onSubmit={submitForFeedback} />}
         {view === "feedback" && selectedFeedback && <FeedbackResult feedback={selectedFeedback} submission={selectedSubmission} onResubmit={() => navigate("answer")} />}
