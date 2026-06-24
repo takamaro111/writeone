@@ -57,11 +57,23 @@
   }
 
   .tab-button {
-    @apply flex flex-col items-center justify-center gap-1 text-[11px] font-black text-slate-500;
+    @apply flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1 text-[11px] font-black text-slate-500 transition active:scale-95;
   }
 
   .tab-button-active {
     @apply text-navy;
+  }
+
+  .tab-icon {
+    @apply grid h-9 w-9 place-items-center rounded-2xl text-slate-500 transition;
+  }
+
+  .tab-button-active .tab-icon {
+    @apply bg-navy text-white shadow-soft;
+  }
+
+  .tab-label {
+    @apply leading-none;
   }
 
 }

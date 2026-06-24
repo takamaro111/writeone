@@ -28,13 +28,67 @@ const levelNames: Record<Level, string> = {
   Master: "Master"
 };
 
-const navItems: { view: View; label: string; icon: string }[] = [
-  { view: "home", label: "ホーム", icon: "⌂" },
-  { view: "prints", label: "プリント", icon: "□" },
-  { view: "progress", label: "進捗", icon: "◌" },
-  { view: "history", label: "履歴", icon: "≡" },
-  { view: "profile", label: "マイページ", icon: "◎" }
+type NavIconName = "home" | "prints" | "progress" | "history" | "profile";
+
+const navItems: { view: View; label: string; icon: NavIconName }[] = [
+  { view: "home", label: "ホーム", icon: "home" },
+  { view: "prints", label: "プリント", icon: "prints" },
+  { view: "progress", label: "進捗", icon: "progress" },
+  { view: "history", label: "履歴", icon: "history" },
+  { view: "profile", label: "マイページ", icon: "profile" }
 ];
+
+function NavIcon({ name }: { name: NavIconName }) {
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    strokeWidth: 2.2
+  };
+
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+      {name === "home" && (
+        <>
+          <path {...common} d="M3.5 11.2 12 4l8.5 7.2" />
+          <path {...common} d="M6.5 10.7V20h11v-9.3" />
+          <path {...common} d="M10 20v-5h4v5" />
+        </>
+      )}
+      {name === "prints" && (
+        <>
+          <path {...common} d="M7 3.8h7l3 3V20.2H7z" />
+          <path {...common} d="M14 3.8v3h3" />
+          <path {...common} d="M9.5 11h5" />
+          <path {...common} d="M9.5 14.5h5" />
+        </>
+      )}
+      {name === "progress" && (
+        <>
+          <path {...common} d="M4 19V5" />
+          <path {...common} d="M4 19h16" />
+          <path {...common} d="M8 15.5v-4" />
+          <path {...common} d="M12 15.5V8" />
+          <path {...common} d="M16 15.5v-6" />
+        </>
+      )}
+      {name === "history" && (
+        <>
+          <path {...common} d="M5 7.5h10.5A4.5 4.5 0 0 1 20 12v0a4.5 4.5 0 0 1-4.5 4.5H7" />
+          <path {...common} d="M7.5 4.8 4.8 7.5l2.7 2.7" />
+          <path {...common} d="M12 9.2V12l2.2 1.5" />
+        </>
+      )}
+      {name === "profile" && (
+        <>
+          <circle {...common} cx="12" cy="8" r="3.2" />
+          <path {...common} d="M5.5 19.5c.8-3.4 3.1-5.1 6.5-5.1s5.7 1.7 6.5 5.1" />
+        </>
+      )}
+    </svg>
+  );
+}
 
 function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;
@@ -941,8 +995,8 @@ export default function App() {
         <div className="mx-auto grid max-w-md grid-cols-5">
           {navItems.map((item) => (
             <button key={item.view} className={`tab-button ${view === item.view ? "tab-button-active" : ""}`} onClick={() => { setViewHistory([]); setView(item.view); }}>
-              <span className="text-lg leading-none">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="tab-icon"><NavIcon name={item.icon} /></span>
+              <span className="tab-label">{item.label}</span>
             </button>
           ))}
         </div>
