@@ -56,6 +56,16 @@
     @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base outline-none transition focus:border-navy focus:ring-4 focus:ring-navy/10;
   }
 
+  .time-input {
+    @apply block rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-base font-black text-ink outline-none transition focus:border-navy focus:ring-4 focus:ring-navy/10;
+    box-sizing: border-box;
+    width: min(180px, 100%);
+    max-width: 100%;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   .tab-button {
     @apply flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1 text-[11px] font-black text-slate-500 transition active:scale-95;
   }

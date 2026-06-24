@@ -784,7 +784,7 @@ function Profile({ profile, favorites, onLogout, onAdmin }: { profile: UserProfi
           <span className="text-sm font-black">Push通知</span>
           <button className="secondary-button !py-2">ON / OFF</button>
         </div>
-        <input className="input mt-3 max-w-[180px]" type="time" defaultValue="20:00" />
+        <input className="time-input mt-3" type="time" defaultValue="20:00" />
       </section>
       <section className="card p-5">
         <p className="section-title">サブスクリプション</p>
