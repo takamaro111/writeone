@@ -25,6 +25,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/pdf\//],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"]
