@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { prints, levels, getPrintByCode } from "./data/prints";
 import { canUseSupabaseAuth, getCurrentProfile, signInWithEmail, signInWithProvider, signOut, signUpWithEmail } from "./lib/auth";
+import { loadCloudLearningState, setCloudFavorite, upsertCloudProgress } from "./lib/cloudData";
 import { gradeEssay } from "./lib/gradeEssay";
 import {
   clearDraft,
@@ -862,13 +863,39 @@ export default function App() {
 
   useEffect(() => {
     if (!profile) return;
-    setSubmissions(getSubmissions(profile.id));
-    setProgress(initialProgress(profile.id));
-    setFavorites(getFavorites(profile.id));
+    const localSubmissions = getSubmissions(profile.id);
+    const localProgress = initialProgress(profile.id);
+    const localFavorites = getFavorites(profile.id);
+    let cancelled = false;
+
+    setSubmissions(localSubmissions);
+    setProgress(localProgress);
+    setFavorites(localFavorites);
     setAnswer("");
     setAnswerImageDataUrl("");
     setSelectedCode("O-1");
     setSelectedSubmissionId(null);
+
+    if (canUseSupabaseAuth()) {
+      loadCloudLearningState()
+        .then((cloud) => {
+          if (cancelled) return;
+          const nextProgress = { ...initialProgress(profile.id), ...cloud.progress };
+          setSubmissions(cloud.submissions);
+          setProgress(nextProgress);
+          setFavorites(cloud.favorites);
+          saveSubmissions(cloud.submissions, profile.id);
+          saveProgress(nextProgress, profile.id);
+          saveFavorites(cloud.favorites, profile.id);
+        })
+        .catch((error) => {
+          console.error("failed to load cloud learning state", error);
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [profile?.id]);
 
   if (authLoading) {
@@ -908,9 +935,16 @@ export default function App() {
   }
 
   function toggleFavorite(id: string) {
-    const next = favorites.includes(id) ? favorites.filter((item) => item !== id) : [...favorites, id];
+    const isFavorite = !favorites.includes(id);
+    const next = isFavorite ? [...favorites, id] : favorites.filter((item) => item !== id);
     setFavorites(next);
     saveFavorites(next, profile?.id);
+    const print = prints.find((item) => item.id === id);
+    if (print && profile?.id) {
+      setCloudFavorite(print, isFavorite, profile.id).catch((error) => {
+        console.error("failed to sync favorite", error);
+      });
+    }
   }
 
   async function submitForFeedback() {
@@ -941,6 +975,12 @@ export default function App() {
       }
       setProgress(nextProgress);
       saveProgress(nextProgress, profile?.id);
+      if (profile?.id) {
+        await upsertCloudProgress(selected, nextProgress[selected.id], profile.id);
+        if (nextPrintItem && nextProgress[nextPrintItem.id]) {
+          await upsertCloudProgress(nextPrintItem, nextProgress[nextPrintItem.id], profile.id);
+        }
+      }
       setSelectedSubmissionId(reviewed.id);
       navigate("feedback");
     } catch (error) {
