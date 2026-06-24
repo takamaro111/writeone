@@ -889,10 +889,10 @@ function LandingPage({ onStart }: { onStart: () => void }) {
     {
       name: "Pro",
       price: "¥4,980",
-      caption: "集中学習・共同利用向け",
+      caption: "本気で伸ばしたい方向け",
       limit: "月300回までAI添削",
-      lead: "高頻度の添削や教室利用、共同開発・運用テストにも使いやすい上位プランです。",
-      features: ["Premiumの全機能", "AI添削 月300回", "高度な学習分析", "管理者画面", "チーム利用を想定"]
+      lead: "たくさん書いて、何度も添削を受けながら短期間で英作文力を伸ばしたい方向けの上位プランです。",
+      features: ["Premiumの全機能", "AI添削 月300回", "高度な学習分析", "復習しやすい履歴管理", "弱点の見える化"]
     }
   ];
 
@@ -963,7 +963,7 @@ function LandingPage({ onStart }: { onStart: () => void }) {
       <section className="landing-section landing-two-column">
         <div>
           <p className="landing-eyebrow">PDFプリント</p>
-          <h2>教材販売に使える、整ったA4プリント。</h2>
+          <h2>スタイリッシュな<br />A4プリント。</h2>
           <p>
             白背景とネイビー基調のA4縦1ページ設計。回答欄、構成メモ、チェックリスト、語数目安つきで、
             スマホ・PCから閲覧し、PWA内の印刷ボタンから印刷できます。
@@ -1014,6 +1014,9 @@ function LandingPage({ onStart }: { onStart: () => void }) {
         </button>
         <small>クレジットカード不要。Freeプランからすぐに始められます。</small>
       </section>
+      <footer className="landing-footer">
+        <p>Copyright © 2026 WriteOne. All rights reserved.</p>
+      </footer>
     </main>
   );
 }
