@@ -239,7 +239,7 @@ function Header({ profile }: { profile: UserProfile }) {
 }
 
 function BackButton({ view, onBack }: { view: View; onBack: () => void }) {
-  const show = ["detail", "answer", "confirm", "feedback", "admin"].includes(view);
+  const show = ["detail", "pdf", "answer", "confirm", "feedback", "admin"].includes(view);
   if (!show) return null;
 
   return (
@@ -394,23 +394,23 @@ function PrintDetail({ print, onAnswer, onPdf }: { print: PrintItem; onAnswer: (
             <p className="text-3xl font-black text-navy">{print.code}</p>
             <p className="text-sm font-black text-slate-500">{print.level}</p>
           </div>
-          <span className="pill">{print.wordCountMin}?{print.wordCountMax}?</span>
+          <span className="pill">{print.wordCountMin}〜{print.wordCountMax}語</span>
         </div>
         <h2 className="mt-5 text-xl font-black">{print.title}</h2>
         <p className="mt-4 text-lg font-black leading-8">{print.topicJp}</p>
         <p className="mt-2 text-sm font-bold leading-6 text-slate-600">{print.topicEn}</p>
       </section>
       <section className="card p-5">
-        <p className="section-title">??</p>
+        <p className="section-title">構成</p>
         <div className="mt-3 flex flex-wrap gap-2">{print.structure.map((item) => <span key={item} className="pill">{item}</span>)}</div>
-        <p className="section-title mt-5">?????????</p>
+        <p className="section-title mt-5">書く内容のポイント</p>
         <ul className="mt-3 space-y-2 text-sm font-bold text-slate-700">
-          {print.tips.map((tip) => <li key={tip}>? {tip}</li>)}
+          {print.tips.map((tip) => <li key={tip}>・ {tip}</li>)}
         </ul>
       </section>
       <div className="grid grid-cols-2 gap-3">
-        <button className="primary-button" onClick={onAnswer}>????</button>
-        <button className="secondary-button text-center" onClick={onPdf}>PDF???</button>
+        <button className="primary-button" onClick={onAnswer}>回答する</button>
+        <button className="secondary-button text-center" onClick={onPdf}>PDFを開く</button>
       </div>
     </div>
   );
@@ -425,9 +425,9 @@ function PdfViewer({ print }: { print: PrintItem }) {
             <p className="text-lg font-black text-navy">{print.code}</p>
             <p className="text-xs font-bold text-slate-500">{print.title}</p>
           </div>
-          <a className="secondary-button !px-3 !py-2" href={print.pdfUrl} target="_blank" rel="noreferrer">????</a>
+          <a className="secondary-button !px-3 !py-2" href={print.pdfUrl} target="_blank" rel="noreferrer">別で開く</a>
         </div>
-        <iframe className="pdf-frame" src={`${print.pdfUrl}#toolbar=1&navpanes=0&view=FitH`} title={`${print.code} PDF`} />
+        <iframe className="pdf-frame" src={`${print.pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&zoom=page-fit`} title={`${print.code} PDF`} />
       </section>
     </div>
   );
