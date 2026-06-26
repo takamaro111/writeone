@@ -778,7 +778,247 @@ function Analytics({ submissions, progress }: { submissions: Submission[]; progr
   );
 }
 
-function Profile({ profile, favorites, onLogout, onAdmin }: { profile: UserProfile; favorites: string[]; onLogout: () => void; onAdmin: () => void }) {
+type BadgeRarity = "Silver" | "Gold" | "Platinum";
+
+type BadgeItem = {
+  print: PrintItem;
+  earned: boolean;
+  score: number;
+  rarity?: BadgeRarity;
+  earnedAt?: string;
+};
+
+type BadgeTheme = {
+  label: string;
+  icon: string;
+  tone: string;
+};
+
+const badgeThemeRules: { keywords: string[]; label: string; icon: string; tone: string }[] = [
+  { keywords: ["university", "college", "education", "school", "students", "homework", "study", "english", "class", "teacher", "exam"], label: "学習・教育", icon: "🎓", tone: "blue" },
+  { keywords: ["smartphone", "internet", "online", "social media", "technology", "computer", "robots", "ai", "artificial intelligence", "digital"], label: "テクノロジー", icon: "📱", tone: "cyan" },
+  { keywords: ["environment", "climate", "recycling", "energy", "plastic", "nature", "pollution", "green", "earth"], label: "環境・自然", icon: "🌿", tone: "green" },
+  { keywords: ["work", "job", "career", "office", "company", "business", "employee", "salary", "remote"], label: "仕事・キャリア", icon: "💼", tone: "navy" },
+  { keywords: ["money", "economy", "economic", "cash", "tax", "price", "shopping", "buy", "growth"], label: "経済・お金", icon: "💴", tone: "gold" },
+  { keywords: ["health", "exercise", "sports", "sleep", "food", "breakfast", "medicine", "stress", "mental"], label: "健康・生活", icon: "💙", tone: "teal" },
+  { keywords: ["travel", "foreign", "global", "world", "country", "culture", "language", "international"], label: "国際・文化", icon: "🌐", tone: "purple" },
+  { keywords: ["family", "children", "parents", "friends", "people", "community", "relationship"], label: "人間関係", icon: "🤝", tone: "pink" },
+  { keywords: ["book", "books", "movie", "music", "art", "game", "games", "hobby", "reading"], label: "読書・娯楽", icon: "📚", tone: "indigo" },
+  { keywords: ["rule", "law", "government", "society", "public", "crime", "safety", "rights"], label: "社会・ルール", icon: "⚖", tone: "slate" },
+  { keywords: ["future", "innovation", "change", "create", "improve", "important"], label: "未来・成長", icon: "✨", tone: "orange" }
+];
+
+function badgeThemeForPrint(print: PrintItem): BadgeTheme {
+  const text = `${print.topicEn} ${print.topicJp} ${print.title}`.toLowerCase();
+  const matched = badgeThemeRules.find((rule) => rule.keywords.some((keyword) => text.includes(keyword)));
+  if (matched) return { label: matched.label, icon: matched.icon, tone: matched.tone };
+  return { label: `${print.level} Challenge`, icon: "✍", tone: "blue" };
+}
+
+function rarityForScore(score: number): BadgeRarity | undefined {
+  if (score >= 95) return "Platinum";
+  if (score >= 90) return "Gold";
+  if (score >= 75) return "Silver";
+  return undefined;
+}
+
+function buildBadgeItems(submissions: Submission[]) {
+  const bestByPrint = new Map<string, { score: number; earnedAt: string }>();
+  for (const submission of submissions) {
+    const score = submission.feedback?.totalScore ?? 0;
+    if (score < 75) continue;
+    const previous = bestByPrint.get(submission.printId);
+    const earnedAt = submission.feedback?.createdAt ?? submission.createdAt;
+    if (!previous || score > previous.score) {
+      bestByPrint.set(submission.printId, { score, earnedAt });
+    }
+  }
+
+  return prints.map((print): BadgeItem => {
+    const best = bestByPrint.get(print.id);
+    const rarity = best ? rarityForScore(best.score) : undefined;
+    return {
+      print,
+      earned: Boolean(best && rarity),
+      score: best?.score ?? 0,
+      rarity,
+      earnedAt: best?.earnedAt
+    };
+  });
+}
+
+function BadgeCollection({ submissions }: { submissions: Submission[] }) {
+  const [levelFilter, setLevelFilter] = useState<Level | "All">("All");
+  const [sort, setSort] = useState<"newest" | "rarity" | "unearned">("newest");
+  const [expanded, setExpanded] = useState(false);
+  const badges = useMemo(() => buildBadgeItems(submissions), [submissions]);
+  const earned = badges.filter((badge) => badge.earned);
+  const earnedCount = earned.length;
+  const achievementRate = Math.round((earnedCount / prints.length) * 100);
+  const rarityRank: Record<BadgeRarity, number> = { Platinum: 3, Gold: 2, Silver: 1 };
+  const rarityCounts = {
+    Silver: earned.filter((badge) => badge.rarity === "Silver").length,
+    Gold: earned.filter((badge) => badge.rarity === "Gold").length,
+    Platinum: earned.filter((badge) => badge.rarity === "Platinum").length
+  };
+
+  const filteredBadges = badges
+    .filter((badge) => levelFilter === "All" || badge.print.level === levelFilter)
+    .sort((a, b) => {
+      if (sort === "unearned") return Number(a.earned) - Number(b.earned) || a.print.sortOrder - b.print.sortOrder;
+      if (sort === "rarity") return (rarityRank[b.rarity ?? "Silver"] ?? 0) - (rarityRank[a.rarity ?? "Silver"] ?? 0) || b.score - a.score || a.print.sortOrder - b.print.sortOrder;
+      return new Date(b.earnedAt ?? 0).getTime() - new Date(a.earnedAt ?? 0).getTime() || a.print.sortOrder - b.print.sortOrder;
+    });
+  const visibleBadges = expanded ? filteredBadges : filteredBadges.slice(0, 10);
+
+  const graduation = levels.map((level) => {
+    const count = badges.filter((badge) => badge.print.level === level && badge.earned).length;
+    return {
+      level,
+      count,
+      complete: count >= 100,
+      title: level === "Master" ? "Master Conqueror" : `${level} Master`
+    };
+  });
+  const grandMaster = earnedCount >= prints.length;
+
+  return (
+    <section className="card overflow-hidden p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="section-title">バッジコレクション</p>
+          <h3 className="mt-2 text-2xl font-black text-navy">400枚コンプリートを目指そう</h3>
+          <p className="mt-2 text-sm font-bold leading-6 text-slate-600">AI添削スコア75点以上で各プリントの固有バッジを獲得できます。</p>
+        </div>
+        <div className="rounded-2xl bg-navy px-4 py-3 text-right text-white">
+          <p className="text-xs font-black text-white/70">取得数</p>
+          <p className="text-2xl font-black">{earnedCount} / 400</p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Metric label="達成率" value={`${achievementRate}%`} />
+        <Metric label="Silver" value={`${rarityCounts.Silver}`} />
+        <Metric label="Gold" value={`${rarityCounts.Gold}`} />
+        <Metric label="Platinum" value={`${rarityCounts.Platinum}`} />
+      </div>
+
+      <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full rounded-full bg-navy" style={{ width: `${achievementRate}%` }} />
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl bg-mist p-4">
+          <p className="text-sm font-black text-navy">レア度</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <RarityLegend rarity="Silver" text="75〜89点" />
+            <RarityLegend rarity="Gold" text="90〜94点" />
+            <RarityLegend rarity="Platinum" text="95点以上" />
+          </div>
+        </div>
+        <div className="rounded-2xl bg-mist p-4">
+          <p className="text-sm font-black text-navy">卒業バッジ</p>
+          <div className="mt-3 grid gap-2">
+            {graduation.map((item) => (
+              <div key={item.level} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-xs font-black">
+                <span>{item.level}: {item.count} / 100</span>
+                <span className={item.complete ? "text-navy" : "text-slate-400"}>{item.complete ? item.title : "未達成"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className={`mt-4 rounded-2xl p-4 ${grandMaster ? "bg-navy text-white" : "bg-slate-50 text-slate-700"}`}>
+        <p className="text-sm font-black">{grandMaster ? "WriteOne Grand Master 達成" : "WriteOne Grand Master"}</p>
+        <p className="mt-1 text-xs font-bold leading-5">{grandMaster ? "全400枚のバッジを獲得しました。" : "全400枚のバッジ獲得で称号が解放されます。"}</p>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {(["All", ...levels] as const).map((level) => (
+            <button
+              key={level}
+              className={`rounded-full px-4 py-2 text-xs font-black ${levelFilter === level ? "bg-navy text-white" : "bg-mist text-navy"}`}
+              onClick={() => {
+                setLevelFilter(level);
+                setExpanded(false);
+              }}
+            >
+              {level === "All" ? "すべて" : level}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-black text-slate-500">並び替え</span>
+          {[
+            ["newest", "新着順"],
+            ["rarity", "レア度順"],
+            ["unearned", "未取得順"]
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              className={`rounded-full px-3 py-2 text-xs font-black ${sort === value ? "bg-navy text-white" : "bg-mist text-navy"}`}
+              onClick={() => {
+                setSort(value as typeof sort);
+                setExpanded(false);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="badge-grid mt-4">
+        {visibleBadges.map((badge) => <BadgeCard key={badge.print.id} badge={badge} />)}
+      </div>
+      <div className="mt-4 text-center">
+        {filteredBadges.length > 10 && (
+          <button className="secondary-button !px-5 !py-2" onClick={() => setExpanded((value) => !value)}>
+            {expanded ? "閉じる" : `もっと見る（残り${filteredBadges.length - 10}件）`}
+          </button>
+        )}
+        <p className="mt-3 text-xs font-bold text-slate-500">表示中: {visibleBadges.length} / {filteredBadges.length}件</p>
+      </div>
+    </section>
+  );
+}
+
+function RarityLegend({ rarity, text }: { rarity: BadgeRarity; text: string }) {
+  return (
+    <div className="rounded-xl bg-white p-3 text-center">
+      <div className={`badge-medal badge-${rarity.toLowerCase()} mx-auto`}>{rarity[0]}</div>
+      <p className="mt-2 text-xs font-black text-ink">{rarity}</p>
+      <p className="text-[11px] font-bold text-slate-500">{text}</p>
+    </div>
+  );
+}
+
+function BadgeCard({ badge }: { badge: BadgeItem }) {
+  const theme = badgeThemeForPrint(badge.print);
+  return (
+    <article className={`badge-card ${badge.earned ? "badge-card-earned" : "badge-card-locked"}`}>
+      <div className={`theme-badge theme-${theme.tone} ${badge.earned ? "" : "theme-badge-locked"}`}>
+        <span>{theme.icon}</span>
+      </div>
+      <div className="min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <p className="truncate text-sm font-black text-navy">{badge.print.code}</p>
+          <span className={`badge-mini-rarity ${badge.rarity ? `badge-mini-${badge.rarity.toLowerCase()}` : "badge-mini-locked"}`}>
+            {badge.earned ? badge.rarity : "Locked"}
+          </span>
+        </div>
+        <p className="truncate text-[11px] font-black text-slate-600">{theme.label}</p>
+        <p className="truncate text-[10px] font-bold text-slate-400">{badge.print.level}</p>
+        <p className="mt-1 text-[11px] font-black text-slate-600">{badge.earned ? `スコア ${badge.score} /100` : "75点以上で獲得"}</p>
+        {badge.earnedAt && <p className="text-[10px] font-bold text-slate-400">{new Date(badge.earnedAt).toLocaleDateString("ja-JP")}</p>}
+      </div>
+    </article>
+  );
+}
+
+function Profile({ profile, favorites, submissions, onLogout, onAdmin }: { profile: UserProfile; favorites: string[]; submissions: Submission[]; onLogout: () => void; onAdmin: () => void }) {
   return (
     <div className="space-y-4 px-5 py-5">
       <section className="card p-5">
@@ -790,6 +1030,7 @@ function Profile({ profile, favorites, onLogout, onAdmin }: { profile: UserProfi
           <Metric label="お気に入り" value={`${favorites.length}`} />
         </div>
       </section>
+      <BadgeCollection submissions={submissions} />
       <section className="card p-5">
         <p className="section-title">通知設定</p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -1241,7 +1482,7 @@ export default function App() {
         {view === "feedback" && selectedFeedback && <FeedbackResult feedback={selectedFeedback} submission={selectedSubmission} onResubmit={() => navigate("answer")} />}
         {view === "history" && <History submissions={submissions} onOpenFeedback={openSubmissionFeedback} />}
         {view === "progress" && <Analytics submissions={submissions} progress={progress} />}
-        {view === "profile" && <Profile profile={profile} favorites={favorites} onLogout={logout} onAdmin={openAdmin} />}
+        {view === "profile" && <Profile profile={profile} favorites={favorites} submissions={submissions} onLogout={logout} onAdmin={openAdmin} />}
         {view === "admin" && profile.isAdmin && <Admin stats={adminStats} />}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
