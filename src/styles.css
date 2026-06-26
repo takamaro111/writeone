@@ -550,6 +550,12 @@
   color: #ffffff;
 }
 
+.landing-cta-title {
+  max-width: 100%;
+  overflow: hidden;
+  text-wrap: balance;
+}
+
 .landing-cta p {
   opacity: 0.86;
 }
@@ -726,6 +732,11 @@
   .landing-two-column h2,
   .landing-cta h2 {
     font-size: 28px;
+  }
+
+  .landing-cta-title {
+    font-size: 26px;
+    line-height: 1.28;
   }
 
   .landing-two-column h2 {

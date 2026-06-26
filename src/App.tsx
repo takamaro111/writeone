@@ -1005,7 +1005,7 @@ function LandingPage({ onStart }: { onStart: () => void }) {
       </section>
 
       <section className="landing-cta">
-        <h2>400枚の英作文<br />プリントで、<br />書く習慣をつくる。</h2>
+        <h2 className="landing-cta-title">400枚の英作文<br />プリントで、<br />書く習慣をつくる。</h2>
         <p>手書きプリントも写真でそのまま添削。スマホでもPCでも、学習履歴を自動同期します。</p>
         <button type="button" className="landing-cta-button" onClick={onStart}>
           <span className="landing-cta-button-note">登録は1分で完了</span>
