@@ -746,9 +746,139 @@ function SubmissionRow({ submission, onOpen }: { submission: Submission; onOpen?
   );
 }
 
+type ReviewedSubmission = Submission & { feedback: Feedback };
+
+type TrendPoint = {
+  label: string;
+  value: number;
+};
+
+function reviewedSubmissions(submissions: Submission[]) {
+  return submissions
+    .filter((item): item is ReviewedSubmission => Boolean(item.feedback))
+    .sort((a, b) => new Date(a.feedback.createdAt || a.createdAt).getTime() - new Date(b.feedback.createdAt || b.createdAt).getTime());
+}
+
+function averageFirstAttemptScore(items: ReviewedSubmission[]) {
+  const firstByPrint = new Map<string, ReviewedSubmission>();
+  for (const item of items) {
+    if (!firstByPrint.has(item.printId)) firstByPrint.set(item.printId, item);
+  }
+  return avg([...firstByPrint.values()].map((item) => item.feedback.totalScore));
+}
+
+function averageResubmissionScore(items: ReviewedSubmission[]) {
+  const byPrint = new Map<string, ReviewedSubmission[]>();
+  for (const item of items) {
+    byPrint.set(item.printId, [...(byPrint.get(item.printId) ?? []), item]);
+  }
+  const resubmissions = [...byPrint.values()].flatMap((group) => group.slice(1));
+  return avg(resubmissions.map((item) => item.feedback.totalScore));
+}
+
+function scoreTrend(items: ReviewedSubmission[], selector: (feedback: Feedback) => number): TrendPoint[] {
+  return items.slice(-12).map((item, index) => ({
+    label: `${index + 1}`,
+    value: selector(item.feedback)
+  }));
+}
+
+function trendDelta(points: TrendPoint[]) {
+  if (points.length < 2) return 0;
+  return points[points.length - 1].value - points[0].value;
+}
+
+function ScoreLineChart({ title, points, color = "#0b2a66" }: { title: string; points: TrendPoint[]; color?: string }) {
+  const width = 320;
+  const height = 140;
+  const pad = 18;
+  const values = points.map((point) => point.value);
+  const min = Math.min(50, ...values);
+  const max = Math.max(100, ...values);
+  const range = Math.max(1, max - min);
+  const plotted = points.map((point, index) => {
+    const x = points.length === 1 ? width / 2 : pad + (index / (points.length - 1)) * (width - pad * 2);
+    const y = height - pad - ((point.value - min) / range) * (height - pad * 2);
+    return { x, y, ...point };
+  });
+  const path = plotted.map((point) => `${point.x},${point.y}`).join(" ");
+
+  return (
+    <div className="rounded-2xl bg-mist p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-black text-navy">{title}</p>
+        <p className={`text-sm font-black ${trendDelta(points) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+          {trendDelta(points) >= 0 ? "+" : ""}{trendDelta(points)}
+        </p>
+      </div>
+      {points.length ? (
+        <svg className="mt-3 h-auto w-full" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${title}の推移`}>
+          <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#dbe3ef" strokeWidth="2" />
+          <line x1={pad} y1={pad} x2={pad} y2={height - pad} stroke="#dbe3ef" strokeWidth="2" />
+          <polyline points={path} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          {plotted.map((point) => (
+            <g key={`${point.label}-${point.x}`}>
+              <circle cx={point.x} cy={point.y} r="4.5" fill="#ffffff" stroke={color} strokeWidth="3" />
+            </g>
+          ))}
+        </svg>
+      ) : (
+        <p className="mt-3 rounded-xl bg-white p-4 text-sm font-bold text-slate-500">AI添削結果がまだありません。</p>
+      )}
+    </div>
+  );
+}
+
+function WeaknessTrend({ items }: { items: ReviewedSubmission[] }) {
+  const previous = items.slice(-10, -5).map((item) => item.feedback);
+  const recent = items.slice(-5).map((item) => item.feedback);
+  const skills = [
+    ["文法", "grammarScore"],
+    ["語彙", "vocabularyScore"],
+    ["論理", "logicScore"],
+    ["構成", "structureScore"],
+    ["一貫性", "consistencyScore"]
+  ] as const;
+
+  return (
+    <section className="card p-5">
+      <p className="section-title">弱点推移</p>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-500">直近5回と、その前の5回の平均を比較します。</p>
+      <div className="mt-4 space-y-3">
+        {skills.map(([label, key]) => {
+          const current = avg(recent.map((feedback) => feedback[key]));
+          const before = avg(previous.map((feedback) => feedback[key]));
+          const delta = current - before;
+          return (
+            <div key={label} className="rounded-2xl bg-mist p-3">
+              <div className="flex items-center justify-between text-sm font-black">
+                <span>{label}</span>
+                <span className={delta >= 0 ? "text-emerald-600" : "text-red-600"}>{before ? `${delta >= 0 ? "+" : ""}${delta}` : "計測中"}</span>
+              </div>
+              <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-3">
+                <div className="h-2 overflow-hidden rounded-full bg-white">
+                  <div className="h-full rounded-full bg-navy" style={{ width: `${current}%` }} />
+                </div>
+                <span className="text-xs font-black text-navy">{current || 0}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function Analytics({ submissions, progress }: { submissions: Submission[]; progress: Record<string, PrintProgress> }) {
   const completed = Object.values(progress).filter((item) => item.status === "completed").length;
-  const scoreItems = submissions.map((item) => item.feedback).filter(Boolean) as Feedback[];
+  const reviewed = reviewedSubmissions(submissions);
+  const scoreItems = reviewed.map((item) => item.feedback);
+  const firstScore = averageFirstAttemptScore(reviewed);
+  const resubmissionScore = averageResubmissionScore(reviewed);
+  const growthPoints = scoreTrend(reviewed, (feedback) => feedback.totalScore);
+  const grammarPoints = scoreTrend(reviewed, (feedback) => feedback.grammarScore);
+  const vocabularyPoints = scoreTrend(reviewed, (feedback) => feedback.vocabularyScore);
+  const logicPoints = scoreTrend(reviewed, (feedback) => feedback.logicScore);
   const weakness = [
     ["文法", avg(scoreItems.map((f) => f.grammarScore))],
     ["語彙", avg(scoreItems.map((f) => f.vocabularyScore))],
@@ -760,9 +890,30 @@ function Analytics({ submissions, progress }: { submissions: Submission[]; progr
     <div className="space-y-4 px-5 py-5">
       <section className="card grid grid-cols-3 gap-3 p-5 text-center">
         <Metric label="完了" value={`${completed}`} />
-        <Metric label="平均" value={`${averageScore(submissions)}点`} />
+        <Metric label="総合平均" value={`${averageScore(submissions)}点`} />
         <Metric label="提出" value={`${submissions.length}`} />
       </section>
+      <section className="card p-5">
+        <p className="section-title">スコア比較</p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <Metric label="初回平均" value={firstScore ? `${firstScore}点` : "-"} />
+          <Metric label="再提出平均" value={resubmissionScore ? `${resubmissionScore}点` : "-"} />
+        </div>
+        <p className="mt-3 text-xs font-bold leading-5 text-slate-500">同じプリントを複数回提出した場合、2回目以降を再提出として集計します。</p>
+      </section>
+      <section className="card p-5">
+        <p className="section-title">成長グラフ</p>
+        <p className="mt-2 text-xs font-bold leading-5 text-slate-500">右上の数値は、グラフに表示している範囲の最初のスコアと最後のスコアの差です。</p>
+        <div className="mt-4">
+          <ScoreLineChart title="総合スコア推移" points={growthPoints} />
+        </div>
+      </section>
+      <div className="grid gap-4 md:grid-cols-3">
+        <ScoreLineChart title="文法推移" points={grammarPoints} color="#0f766e" />
+        <ScoreLineChart title="語彙推移" points={vocabularyPoints} color="#7c3aed" />
+        <ScoreLineChart title="論理推移" points={logicPoints} color="#d97706" />
+      </div>
+      <WeaknessTrend items={reviewed} />
       <section className="card p-5">
         <p className="section-title">レベル別進捗</p>
         <div className="mt-4 space-y-3">{levels.map((level) => {
