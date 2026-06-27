@@ -118,8 +118,22 @@ function nextPrint(progress: Record<string, PrintProgress>) {
   return prints.find((print) => statusFor(print, progress) === "unlocked") ?? prints[0];
 }
 
+function localDateKey(value: string | Date) {
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function totalStudyDays(submissions: Submission[]) {
-  return new Set(submissions.map((item) => item.createdAt.slice(0, 10))).size;
+  const submittedDays = submissions
+    .filter((item) => item.status !== "draft" && item.answerText.trim())
+    .map((item) => localDateKey(item.createdAt))
+    .filter(Boolean);
+
+  return new Set(submittedDays).size;
 }
 
 function fileToImageDataUrl(file: File): Promise<string> {
@@ -335,7 +349,8 @@ function Home({
   onOpenFeedback: (submission: Submission) => void;
 }) {
   const today = nextPrint(progress);
-  const completedToday = submissions.some((item) => item.createdAt.slice(0, 10) === new Date().toISOString().slice(0, 10));
+  const todayKey = localDateKey(new Date());
+  const completedToday = submissions.some((item) => item.status !== "draft" && item.answerText.trim() && localDateKey(item.createdAt) === todayKey);
   const recent = submissions.slice(-3).reverse();
 
   return (
